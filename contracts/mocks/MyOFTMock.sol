@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.22;
 
-import { MyOFT } from "../standarOFT/MyOFT.sol";
+import { MyOFT } from "../standardOFT/MyOFT.sol";
 
 // @dev WARNING: This is for testing purposes only
 contract MyOFTMock is MyOFT {
