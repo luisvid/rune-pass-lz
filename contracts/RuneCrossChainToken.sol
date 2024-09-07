@@ -13,24 +13,13 @@ import { OFT } from "@layerzerolabs/oft-evm/contracts/OFT.sol";
 contract RuneCrossChainToken is OFT {
     /// @notice Struct to hold metadata of the Rune.
     struct RuneMetadata {
-        bytes32 runeId;     // A unique identifier or content of the Rune
-        string runeOwner;   // The original owner's Taproot address
-        uint256 bagAmount;  // The number of Runes in the bag
+        bytes32 runeId; // A unique identifier or content of the Rune
+        string runeOwner; // The original owner's Taproot address
+        uint256 bagAmount; // The number of Runes in the bag
     }
 
     /// @notice The metadata of the Bitcoin Rune.
     RuneMetadata public runeMetadata;
-
-    /// @notice The address of the Factory that is allowed to mint tokens.
-    address public immutable factory;
-
-    /**
-     * @dev Modifier to restrict minting to the factory contract.
-     */
-    modifier onlyFactory() {
-        require(msg.sender == factory, "Only the factory can mint tokens");
-        _;
-    }
 
     /**
      * @dev Constructor to initialize the Bitcoin Rune's metadata along with LayerZero parameters.
@@ -39,22 +28,17 @@ contract RuneCrossChainToken is OFT {
      * @param _lzEndpoint The LayerZero endpoint to facilitate cross-chain transfers.
      * @param _delegate The address of the contract delegate or owner.
      * @param _metadata The Rune metadata (runeId, runeOwner, bagAmount).
-     * @param _factory The address of the factory allowed to mint tokens.
      */
     constructor(
         string memory _name,
         string memory _symbol,
         address _lzEndpoint,
         address _delegate,
-        RuneMetadata memory _metadata,
-        address _factory
+        RuneMetadata memory _metadata
     ) OFT(_name, _symbol, _lzEndpoint, _delegate) Ownable(_delegate) {
         require(bytes(_metadata.runeOwner).length > 0, "Rune owner cannot be empty");
         require(_metadata.bagAmount > 0, "Bag amount must be greater than 0");
-        require(_factory != address(0), "Factory address cannot be zero");
-
         runeMetadata = _metadata;
-        factory = _factory;
     }
 
     /**
@@ -63,7 +47,7 @@ contract RuneCrossChainToken is OFT {
      * @param _recipient The address to receive the minted tokens.
      * @param _amount The amount of tokens to mint.
      */
-    function mint(address _recipient, uint256 _amount) external onlyFactory {
+    function mint(address _recipient, uint256 _amount) external onlyOwner {
         require(_recipient != address(0), "Recipient cannot be the zero address");
         _mint(_recipient, _amount);
     }
