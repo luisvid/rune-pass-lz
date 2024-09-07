@@ -35,7 +35,7 @@ contract OFTFactory is Ownable {
     /// @param chainId The chain ID where the OFT is being deployed
     /// @return The address of the newly deployed OFT
     function deployOFT(string memory name, string memory symbol, uint32 chainId) external onlyOwner returns (address) {
-        // require(getOFTAddress(name, symbol, chainId) == address(0), "OFT already deployed");
+        require(getOFTAddress(name, symbol, chainId) == address(0), "OFT already deployed");
 
         // Deploy the OFT contract
         MyOFT newOFT = new MyOFT(name, symbol, lzEndpoint, address(this));
