@@ -5,11 +5,11 @@ import { Options } from '@layerzerolabs/lz-v2-utilities'
 
 dotenv.config()
 
-import MyOFTArtifact from '../artifacts/contracts/MyOFT.sol/MyOFT.json'
-import OFTFactoryArtifact from '../artifacts/contracts/OFTFactory.sol/OFTFactory.json'
+import MyOFTArtifact from '../artifacts/contracts/standardOFT/MyOFT.sol/MyOFT.json'
+import OFTFactoryArtifact from '../artifacts/contracts/standardOFT/OFTFactory.sol/OFTFactory.json'
 
 // command to run this script:
-//  npx ts-node scripts/interact_with_oft.ts
+// npx ts-node scripts/interact_with_oft.ts
 
 // Ensure the ABI is correctly typed
 const MyOFT_abi = MyOFTArtifact.abi as ethers.ContractInterface
@@ -55,6 +55,7 @@ async function main() {
     console.log('OFT A (Fuji) deployed at:', oftAAddress)
     console.log('OFT B (BaseSep) deployed at:', oftBAddress)
 
+    // connect to the deployed OFTs
     const oftA = new ethers.Contract(oftAAddress, MyOFT_abi, fujiWallet)
     const oftB = new ethers.Contract(oftBAddress, MyOFT_abi, baseSepoliaWallet)
 
