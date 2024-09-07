@@ -8,6 +8,9 @@ dotenv.config()
 import MyOFTArtifact from '../artifacts/contracts/MyOFT.sol/MyOFT.json'
 import OFTFactoryArtifact from '../artifacts/contracts/OFTFactory.sol/OFTFactory.json'
 
+// command to run this script:
+//  npx ts-node scripts/interact_with_oft.ts
+
 // Ensure the ABI is correctly typed
 const MyOFT_abi = MyOFTArtifact.abi as ethers.ContractInterface
 const OFTFactory_abi = OFTFactoryArtifact.abi as ethers.ContractInterface

@@ -4,6 +4,10 @@ import { type DeployFunction } from 'hardhat-deploy/types'
 
 const contractName = 'OFTFactory'
 
+// commands to run:
+// npx hardhat lz:deploy --tags OFTFactory
+// npx hardhat lz:deploy --tags OFTFactory --networks base-sepolia
+
 const deploy: DeployFunction = async (hre) => {
     const { getNamedAccounts, deployments } = hre
 
@@ -22,10 +26,6 @@ const deploy: DeployFunction = async (hre) => {
     //
     // For this to work correctly, your network config must define an eid property
     // set to `EndpointId` as defined in @layerzerolabs/lz-definitions
-    //
-    // commands to run:
-    // npx hardhat lz:deploy --tags OFTFactory
-    // npx hardhat lz:deploy --tags OFTFactory --networks base-sepolia
 
     const endpointV2Deployment = await hre.deployments.get('EndpointV2')
 
