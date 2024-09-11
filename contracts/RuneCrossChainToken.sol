@@ -27,15 +27,25 @@ contract RuneCrossChainToken is OFT {
      * @param _symbol The symbol of the ERC20 token.
      * @param _lzEndpoint The LayerZero endpoint to facilitate cross-chain transfers.
      * @param _delegate The address of the contract delegate or owner.
-     * @param _metadata The Rune metadata (runeId, runeOwner, bagAmount).
      */
     constructor(
         string memory _name,
         string memory _symbol,
         address _lzEndpoint,
-        address _delegate,
-        RuneMetadata memory _metadata
+        address _delegate
+        // RuneMetadata memory _metadata
     ) OFT(_name, _symbol, _lzEndpoint, _delegate) Ownable(_delegate) {
+        // require(bytes(_metadata.runeOwner).length > 0, "Rune owner cannot be empty");
+        // require(_metadata.bagAmount > 0, "Bag amount must be greater than 0");
+        // runeMetadata = _metadata;
+    }
+
+    /**
+     * @notice Configures the metadata of the Rune.
+     * @dev This function can only be called by the factory.
+     * @param _metadata The metadata of the Rune (runeId, runeOwner, bagAmount).
+     */
+    function configureRuneMetadata(RuneMetadata memory _metadata) external onlyOwner {
         require(bytes(_metadata.runeOwner).length > 0, "Rune owner cannot be empty");
         require(_metadata.bagAmount > 0, "Bag amount must be greater than 0");
         runeMetadata = _metadata;
