@@ -29,8 +29,9 @@ const BASE_SEPOLIA_RPC = process.env.BASESEP_V2_TESTNET || 'https://sepolia.base
 console.log('BASE_SEPOLIA_RPC:', BASE_SEPOLIA_RPC)
 const FUJI_RPC = process.env.AVALANCHE_V2_TESTNET || 'https://rpc.ankr.com/avalanche_fuji'
 console.log('FUJI_RPC:', FUJI_RPC)
-// const FUJI_RPC = 'https://rpc.ankr.com/avalanche_fuji'
-// const BASE_SEPOLIA_RPC = 'https://sepolia.base.org'
+
+// Deployed contract: RuneTokenFactory, network: avalanche-testnet, address: 0x706F2756249cF5c9A71407C1D5F243a863Bf6a26
+// Deployed contract: RuneTokenFactory, network: base-sepolia, address: 0x679eA635Bc951aDc4B87ddfAfC1B6d724d5C1474
 
 // Replace these with your actual deployed RuneTokenFactory addresses
 const BASE_SEPOLIA_FACTORY_ADDRESS = '0x679eA635Bc951aDc4B87ddfAfC1B6d724d5C1474'
@@ -41,9 +42,9 @@ const FUJI_EID = 40106
 
 // Set token names and symbols
 // change token name on each run to avoid name conflicts
-const TOKEN_NAME = 'RuneTokenXX42'
-const TOKEN_SYMBOL_BASE = 'RTBX'
-const TOKEN_SYMBOL_FUJI = 'RTFX'
+const TOKEN_NAME = 'RuneTokenXX44'
+const TOKEN_SYMBOL_BASE = 'RTB44'
+const TOKEN_SYMBOL_FUJI = 'RTF44'
 
 async function main() {
     const privateKey = process.env.PRIVATE_KEY
@@ -138,22 +139,25 @@ async function main() {
     await tx4.wait()
 
     // ############################################################################
-    // New RuneCrossChainTokens configuration
+    // END New RuneCrossChainTokens configuration
     // ############################################################################
 
-    // Mint tokens
+    // Mint tokens in Base Sepolia
     const initialAmount = ethers.utils.parseEther('100')
-    await runeTokenFuji.mint(fujiWallet.address, initialAmount)
-
+    await runeTokenBase.mint(baseSepoliaWallet.address, initialAmount)
     console.log('Initial balance on Fuji:', ethers.utils.formatEther(await runeTokenFuji.balanceOf(fujiWallet.address)))
+
+    // ############################################################################
+    // Transfer tokens cross-chain
+    // ############################################################################
 
     // Prepare cross-chain transfer from Base Sepolia to Fuji
     const options = Options.newOptions().addExecutorLzReceiveOption(65000, 0).toBytes()
     const tokensToSend = ethers.utils.parseEther('10')
 
     const sendParam: SendParam = {
-        dstEid: BASE_SEPOLIA_EID,
-        to: addressToBytes32(baseSepoliaWallet.address),
+        dstEid: FUJI_EID,
+        to: addressToBytes32(fujiWallet.address),
         amountLD: tokensToSend,
         minAmountLD: tokensToSend,
         extraOptions: options,
@@ -162,12 +166,12 @@ async function main() {
     }
 
     // Get the quote for the send operation
-    const feeQuote = await runeTokenFuji.quoteSend(sendParam, false)
+    const feeQuote = await runeTokenBase.quoteSend(sendParam, false)
     const nativeFee = feeQuote.nativeFee
 
     console.log('Sending tokens cross-chain...')
 
-    const tx = await runeTokenFuji.send(sendParam, { nativeFee: nativeFee, lzTokenFee: 0 }, baseSepoliaWallet.address, {
+    const tx = await runeTokenBase.send(sendParam, { nativeFee: nativeFee, lzTokenFee: 0 }, fujiWallet.address, {
         value: nativeFee,
     })
 
@@ -175,12 +179,16 @@ async function main() {
     await tx.wait()
     console.log(`Send tx initiated. See: https://layerzeroscan.com/tx/${tx.hash}`)
 
-    // Check final balances
-    const finalBalanceFuji = await runeTokenFuji.balanceOf(fujiWallet.address)
-    const finalBalanceBase = await runeTokenBase.balanceOf(baseSepoliaWallet.address)
+    // ############################################################################
+    // END Transfer tokens cross-chain
+    // ############################################################################
 
-    console.log('Final balance on Fuji:', ethers.utils.formatEther(finalBalanceFuji))
+    // Check final balances
+    const finalBalanceBase = await runeTokenBase.balanceOf(baseSepoliaWallet.address)
+    const finalBalanceFuji = await runeTokenFuji.balanceOf(fujiWallet.address)
+
     console.log('Final balance on Base Sepolia:', ethers.utils.formatEther(finalBalanceBase))
+    console.log('Final balance on Fuji:', ethers.utils.formatEther(finalBalanceFuji))
 
     // Get and log Rune metadata
     const metadataBase = await runeTokenBase.getRuneMetadata()
