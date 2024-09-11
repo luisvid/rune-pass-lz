@@ -64,7 +64,17 @@ const config: HardhatUserConfig = {
         },
         'base-sepolia': {
             eid: EndpointId.BASESEP_V2_TESTNET,
-            url: process.env.RPC_URL_BASESEPOLIA || 'https://sepolia.base.org/',
+            url: process.env.RPC_URL_BASESEPOLIA || 'https://sepolia.base.org',
+            accounts,
+        },
+        'morph-testnet': {
+            eid: EndpointId.MORPH_V2_TESTNET,
+            url: process.env.RPC_URL_MORPH || 'https://rpc-quicknode-holesky.morphl2.io',
+            accounts,
+        },
+        'hedera-testnet': {
+            eid: EndpointId.HEDERA_V2_TESTNET,
+            url: process.env.RPC_URL_HEDERA || 'https://testnet.hashio.io/api',
             accounts,
         },
     },
