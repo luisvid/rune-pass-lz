@@ -92,10 +92,16 @@ async function main() {
     console.log('Native fee:', ethers.utils.formatEther(nativeFee))
 
     console.log('Sending tokens cross-chain...')
-    const tx = await oftA.send(sendParam, [nativeFee, 0], fujiWallet.address, { value: nativeFee })
+    const tx = await oftA.send(sendParam, [nativeFee, 0], fujiWallet.address, {
+        value: nativeFee,
+        gasLimit: 300000,
+        gasPrice: ethers.utils.parseUnits('50', 'gwei'),
+    })
 
     // Log the transaction hash
     console.log('Transaction hash:', tx.hash)
+    console.log('Check the status of your transaction on LayerZero Scan:')
+    console.log(`https://testnet.layerzeroscan.com/tx/${tx.hash}`)
 
     // Wait for the transaction to be mined
     const receipt = await tx.wait()
