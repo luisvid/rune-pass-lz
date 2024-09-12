@@ -33,12 +33,7 @@ contract RuneCrossChainToken is OFT {
         string memory _symbol,
         address _lzEndpoint,
         address _delegate
-        // RuneMetadata memory _metadata
-    ) OFT(_name, _symbol, _lzEndpoint, _delegate) Ownable(_delegate) {
-        // require(bytes(_metadata.runeOwner).length > 0, "Rune owner cannot be empty");
-        // require(_metadata.bagAmount > 0, "Bag amount must be greater than 0");
-        // runeMetadata = _metadata;
-    }
+    ) OFT(_name, _symbol, _lzEndpoint, _delegate) Ownable(_delegate) {}
 
     /**
      * @notice Configures the metadata of the Rune.
@@ -64,9 +59,12 @@ contract RuneCrossChainToken is OFT {
 
     /**
      * @notice Returns the full metadata of the Rune.
-     * @return The Rune metadata (runeId, runeOwner, bagAmount).
+     * @return runeId The unique identifier or content of the Rune.
+     * @return runeOwner The original owner's Taproot address.
+     * @return bagAmount The number of Runes in the bag.
      */
-    function getRuneMetadata() external view returns (RuneMetadata memory) {
-        return runeMetadata;
+    function getRuneMetadata() external view returns (bytes32 runeId, string memory runeOwner, uint256 bagAmount) {
+        RuneMetadata memory metadata = runeMetadata;
+        return (metadata.runeId, metadata.runeOwner, metadata.bagAmount);
     }
 }

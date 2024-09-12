@@ -42,14 +42,14 @@ contract RuneTokenFactory is Ownable {
         uint32 _chainId
     ) external onlyOwner returns (address) {
         // Check if a token has already been created for this Rune
-        address tokenAddress = getOFTAddress(_name, _symbol, _chainId);
+        bytes32 key = keccak256(abi.encodePacked(_name, _symbol, _chainId));
+        address tokenAddress = deployedRunesToken[key];
         require(tokenAddress == address(0), "Rune token already deployed");
 
         // If no token exists, deploy a new RuneCrossChainToken
         RuneCrossChainToken newToken = new RuneCrossChainToken(_name, _symbol, lzEndpoint, address(this));
 
         // Store the deployed contract's address in the runeToToken mapping
-        bytes32 key = keccak256(abi.encodePacked(_name, _symbol, _chainId));
         deployedRunesToken[key] = address(newToken);
 
         // Emit an event for the new token creation
@@ -77,8 +77,6 @@ contract RuneTokenFactory is Ownable {
         require(_bagAmount > 0, "Bag amount must be greater than 0");
 
         RuneCrossChainToken oft = RuneCrossChainToken(oftAddress);
-        // check if the OFT address is valid
-        require(address(oft) == oftAddress, "Invalid OFT address");
 
         // Create RuneMetadata struct
         RuneCrossChainToken.RuneMetadata memory metadata = RuneCrossChainToken.RuneMetadata({
@@ -100,12 +98,16 @@ contract RuneTokenFactory is Ownable {
     }
 
     /// @notice Transfers ownership of a deployed OFT
-    /// @dev Only the factory owner can call this function
+    /// @dev Only the factory owner can call this function. Ownership is transferred only if the newOwner is different from the current owner.
     /// @param oftAddress The address of the OFT to transfer ownership of
     /// @param newOwner The address of the new owner
     function transferOFTOwnership(address oftAddress, address newOwner) external onlyOwner {
+        require(newOwner != address(0), "New owner cannot be the zero address");
+
         RuneCrossChainToken oft = RuneCrossChainToken(oftAddress);
         address currentOwner = oft.owner();
+
+        // Avoiding revert by transferring only if the new owner is different
         if (currentOwner != newOwner) {
             oft.transferOwnership(newOwner);
         }
